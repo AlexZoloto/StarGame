@@ -1,13 +1,13 @@
 package ru.geekbrains.stargame.base;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
+        import com.badlogic.gdx.Game;
+        import com.badlogic.gdx.Gdx;
+        import com.badlogic.gdx.InputProcessor;
+        import com.badlogic.gdx.Screen;
+        import com.badlogic.gdx.math.Vector2;
 
 public class Base2DScreen implements Screen, InputProcessor{
-
-    protected Game game;
+    private Game game;
 
     public Base2DScreen(Game game) {
         this.game = game;
@@ -26,7 +26,6 @@ public class Base2DScreen implements Screen, InputProcessor{
 
     @Override
     public void resize(int width, int height) {
-        System.out.println("width: " + width + "height: " + height);
     }
 
     @Override
@@ -69,19 +68,16 @@ public class Base2DScreen implements Screen, InputProcessor{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        System.out.println("touchDown screenX = " + screenX + " screenY = " + screenY);
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        System.out.println("touchUp screenX = " + screenX + " screenY = " + screenY);
         return false;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        System.out.println("touchDragged screenX = " + screenX + " screenY = " + screenY);
         return false;
     }
 
@@ -93,5 +89,20 @@ public class Base2DScreen implements Screen, InputProcessor{
     @Override
     public boolean scrolled(int amount) {
         return false;
+    }
+
+    protected void changePosition(Vector2 position, float positionX, float positionY, Vector2 speed){
+        if (position.x < positionX){
+            position.x += speed.x;
+        }
+        if (position.x > positionX){
+            position.x -= speed.x;
+        }
+        if (position.y < positionY){
+            position.y += speed.y;
+        }
+        if (position.y > positionY){
+            position.y -= speed.y;
+        }
     }
 }
