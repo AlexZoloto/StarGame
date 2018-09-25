@@ -17,11 +17,11 @@ public class ButtonExit extends Sprite {
     @Override
     public boolean touchDown(Vector2 touch, int pointer) {
         if (!pressed || !isMe(touch)){
+            this.pointer = pointer;
+            this.pressed = true;
+            scale = 0.9f;
             return false;
         }
-        this.pointer = pointer;
-        this.pressed = true;
-        scale = 0.9f;
         return true;
     }
 
