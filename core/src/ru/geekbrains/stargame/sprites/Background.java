@@ -1,4 +1,4 @@
-package ru.geekbrains.stargame;
+package ru.geekbrains.stargame.sprites;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 

@@ -8,30 +8,25 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-import ru.geekbrains.stargame.base.ActionListener;
-import ru.geekbrains.stargame.sprites.Background;
-import ru.geekbrains.stargame.sprites.ButtonExit;
 import ru.geekbrains.stargame.base.Base2DScreen;
 import ru.geekbrains.stargame.math.Rect;
-import ru.geekbrains.stargame.sprites.ButtonPlay;
+import ru.geekbrains.stargame.sprites.Background;
+import ru.geekbrains.stargame.sprites.MainShip;
 import ru.geekbrains.stargame.sprites.Stars;
 
-
-public class MenuScreen extends Base2DScreen implements ActionListener {
-
-    private static final int STAR_COUNT = 256;
+public class GameScreen extends Base2DScreen {
+    private static final int STAR_COUNT = 64;
 
     Background background;
-    TextureAtlas atlas;
     Texture bg;
-    Vector2 pos;
+    TextureAtlas atlas;
+    TextureAtlas atlasShipsBullet;
 
-    ButtonExit buttonExit;
-    ButtonPlay buttonPlay;
     Stars[] stars;
 
+    MainShip mainShip;
 
-    public MenuScreen(Game game) {
+    public GameScreen(Game game) {
         super(game);
     }
 
@@ -41,19 +36,20 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
         bg = new Texture("backgroundGame.jpg");
         background = new Background(new TextureRegion(bg));
         atlas = new TextureAtlas("textures/StarGame.pack");
-        buttonExit = new ButtonExit(atlas, this);
-        buttonPlay = new ButtonPlay(atlas, this);
+        atlasShipsBullet = new TextureAtlas("textures/mainAtlas.tpack");
         stars = new Stars[STAR_COUNT];
         for (int i = 0; i < stars.length; i++) {
             stars[i] = new Stars(atlas);
         }
+        mainShip = new MainShip(atlasShipsBullet);
     }
-
 
     @Override
     public void render(float delta) {
         super.render(delta);
         update(delta);
+        checkCollisions();
+        deletedAllDestroyed();
         draw();
     }
 
@@ -61,6 +57,7 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
         for (int i = 0; i < stars.length; i++) {
             stars[i].update(delta);
         }
+        mainShip.update(delta);
     }
 
     public void draw(){
@@ -71,11 +68,17 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
         for (int i = 0; i < stars.length; i++) {
             stars[i].draw(batch);
         }
-        buttonExit.draw(batch);
-        buttonPlay.draw(batch);
+        mainShip.draw(batch);
         batch.end();
     }
 
+    public void checkCollisions(){
+
+    }
+
+    public void deletedAllDestroyed(){
+
+    }
 
     @Override
     protected void resize(Rect worldBounds) {
@@ -83,22 +86,8 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
         for (int i = 0; i < stars.length; i++) {
             stars[i].resize(worldBounds);
         }
-        buttonExit.resize(worldBounds);
-        buttonPlay.resize(worldBounds);
-    }
-
-    @Override
-    public boolean touchDown(Vector2 touch, int pointer) {
-        buttonExit.touchDown(touch,pointer);
-        buttonPlay.touchDown(touch,pointer);
-        return super.touchDown(touch, pointer);
-    }
-
-    @Override
-    public boolean touchUp(Vector2 touch, int pointer) {
-        buttonExit.touchUp(touch,pointer);
-        buttonPlay.touchUp(touch,pointer);
-        return super.touchUp(touch, pointer);
+        mainShip.resize(worldBounds);
+        super.resize(worldBounds);
     }
 
     @Override
@@ -109,13 +98,26 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
     }
 
     @Override
-    public void actionListener(Object src) {
-        if (src == buttonExit){
-            Gdx.app.exit();
-        }
-        if (src == buttonPlay){
-            game.setScreen(new GameScreen(game));
-        }
+    public boolean keyDown(int keycode) {
+        mainShip.keyDown(keycode);
+        return super.keyDown(keycode);
     }
 
+    @Override
+    public boolean keyUp(int keycode) {
+        mainShip.keyUp(keycode);
+        return super.keyUp(keycode);
+    }
+
+    @Override
+    public boolean touchDown(Vector2 touch, int pointer) {
+        mainShip.touchDown(touch,pointer);
+        return super.touchDown(touch, pointer);
+    }
+
+    @Override
+    public boolean touchUp(Vector2 touch, int pointer) {
+        mainShip.touchUp(touch,pointer);
+        return super.touchUp(touch, pointer);
+    }
 }
