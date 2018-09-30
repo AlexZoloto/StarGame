@@ -2,6 +2,7 @@ package ru.geekbrains.stargame.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -10,21 +11,26 @@ import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.stargame.base.Base2DScreen;
 import ru.geekbrains.stargame.math.Rect;
+import ru.geekbrains.stargame.pool.BulletPool;
 import ru.geekbrains.stargame.sprites.Background;
 import ru.geekbrains.stargame.sprites.MainShip;
-import ru.geekbrains.stargame.sprites.Stars;
+import ru.geekbrains.stargame.sprites.Star;
+
 
 public class GameScreen extends Base2DScreen {
+
     private static final int STAR_COUNT = 64;
 
     Background background;
     Texture bg;
     TextureAtlas atlas;
-    TextureAtlas atlasShipsBullet;
+    TextureAtlas atlasGame;
 
-    Stars[] stars;
-
+    Star[] star;
     MainShip mainShip;
+    BulletPool bulletPool;
+
+    Music music;
 
     public GameScreen(Game game) {
         super(game);
@@ -35,13 +41,18 @@ public class GameScreen extends Base2DScreen {
         super.show();
         bg = new Texture("backgroundGame.jpg");
         background = new Background(new TextureRegion(bg));
-        atlas = new TextureAtlas("textures/StarGame.pack");
-        atlasShipsBullet = new TextureAtlas("textures/mainAtlas.tpack");
-        stars = new Stars[STAR_COUNT];
-        for (int i = 0; i < stars.length; i++) {
-            stars[i] = new Stars(atlas);
+        atlasGame = new TextureAtlas("textures/StarGame.tpack");
+        atlas = new TextureAtlas("textures/mainAtlas.tpack");
+        star = new Star[STAR_COUNT];
+        for (int i = 0; i < star.length; i++) {
+            star[i] = new Star(atlasGame);
         }
-        mainShip = new MainShip(atlasShipsBullet);
+        bulletPool = new BulletPool();
+        mainShip = new MainShip(atlas, bulletPool);
+        music = Gdx.audio.newMusic(Gdx.files.internal("sounds/Jon_Bjork_-_The_Darkest_Hour.mp3"));
+        music.setLooping(true);
+        music.setVolume(0.1f);
+        music.play();
     }
 
     @Override
@@ -49,51 +60,55 @@ public class GameScreen extends Base2DScreen {
         super.render(delta);
         update(delta);
         checkCollisions();
-        deletedAllDestroyed();
+        deleteAllDestroyed();
         draw();
     }
 
-    public void update(float delta){
-        for (int i = 0; i < stars.length; i++) {
-            stars[i].update(delta);
+    public void update(float delta) {
+        for (int i = 0; i < star.length; i++) {
+            star[i].update(delta);
         }
         mainShip.update(delta);
+        bulletPool.updateActiveObjects(delta);
     }
 
-    public void draw(){
+    public void checkCollisions() {
+
+    }
+
+    public void deleteAllDestroyed() {
+        bulletPool.freeAllDestroyedActiveObjects();
+    }
+
+    public void draw() {
         Gdx.gl.glClearColor(1, 0.4f, 0.6f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         background.draw(batch);
-        for (int i = 0; i < stars.length; i++) {
-            stars[i].draw(batch);
+        for (int i = 0; i < star.length; i++) {
+            star[i].draw(batch);
         }
         mainShip.draw(batch);
+        bulletPool.drawActiveObjects(batch);
         batch.end();
-    }
-
-    public void checkCollisions(){
-
-    }
-
-    public void deletedAllDestroyed(){
-
     }
 
     @Override
     protected void resize(Rect worldBounds) {
+        super.resize(worldBounds);
         background.resize(worldBounds);
-        for (int i = 0; i < stars.length; i++) {
-            stars[i].resize(worldBounds);
+        for (int i = 0; i < star.length; i++) {
+            star[i].resize(worldBounds);
         }
         mainShip.resize(worldBounds);
-        super.resize(worldBounds);
     }
 
     @Override
     public void dispose() {
         bg.dispose();
-        atlas.dispose();
+        atlasGame.dispose();
+        bulletPool.dispose();
+        mainShip.dispose();
         super.dispose();
     }
 
@@ -111,13 +126,14 @@ public class GameScreen extends Base2DScreen {
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer) {
-        mainShip.touchDown(touch,pointer);
+        mainShip.touchDown(touch, pointer);
         return super.touchDown(touch, pointer);
     }
 
     @Override
     public boolean touchUp(Vector2 touch, int pointer) {
-        mainShip.touchUp(touch,pointer);
+        mainShip.touchUp(touch, pointer);
         return super.touchUp(touch, pointer);
     }
+
 }
