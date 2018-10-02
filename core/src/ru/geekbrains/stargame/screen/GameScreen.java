@@ -3,6 +3,7 @@ package ru.geekbrains.stargame.screen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -31,6 +32,7 @@ public class GameScreen extends Base2DScreen {
     BulletPool bulletPool;
 
     Music music;
+    Sound shootSound;
 
     public GameScreen(Game game) {
         super(game);
@@ -48,11 +50,12 @@ public class GameScreen extends Base2DScreen {
             star[i] = new Star(atlasGame);
         }
         bulletPool = new BulletPool();
-        mainShip = new MainShip(atlas, bulletPool);
+        shootSound = Gdx.audio.newSound(Gdx.files.internal("sounds/shootBlaster.ogg"));
         music = Gdx.audio.newMusic(Gdx.files.internal("sounds/Jon_Bjork_-_The_Darkest_Hour.mp3"));
         music.setLooping(true);
         music.setVolume(0.1f);
         music.play();
+        mainShip = new MainShip(atlas, bulletPool, shootSound);
     }
 
     @Override
