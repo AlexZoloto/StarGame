@@ -30,15 +30,21 @@ public class MainShip extends Ship {
     public MainShip(TextureAtlas atlas, BulletPool bulletPool, Sound shootSound) {
         super(atlas.findRegion("main_ship"), 1, 2, 2, bulletPool, shootSound);
         this.bulletRegion = atlas.findRegion("bulletMainShip");
-        this.bulletHeight = 0.001f;
         this.bulletDamage = 1;
-        this.bulletV.set(0, 0.5f);
+        this.bulletHeight = 0.01f;
+        this.bulletV.set(0, 0.4f);
+        this.reloadInterval = 0.2f;
         setHeightProportion(0.15f);
     }
 
     @Override
     public void update(float delta) {
         pos.mulAdd(v, delta);
+        reloadTimer += delta;
+        if (reloadTimer >= reloadInterval){
+            reloadTimer = 0f;
+            shoot();
+        }
         if (getRight() > worldBounds.getRight()) {
             setRight(worldBounds.getRight());
             stop();
@@ -51,7 +57,7 @@ public class MainShip extends Ship {
 
     @Override
     public void resize(Rect worldBounds) {
-        super.resize(worldBounds);
+        this.worldBounds = worldBounds;
         setBottom(worldBounds.getBottom() + 0.05f);
     }
 
@@ -66,10 +72,6 @@ public class MainShip extends Ship {
             case Input.Keys.RIGHT:
                 pressedRight = true;
                 moveRight();
-                break;
-            case Input.Keys.UP:
-            case Input.Keys.W:
-                shoot();
                 break;
         }
     }
@@ -141,10 +143,6 @@ public class MainShip extends Ship {
 
     private void stop() {
         v.setZero();
-    }
-
-    public void dispose(){
-        shootSound.dispose();
     }
 
 }

@@ -15,13 +15,18 @@ public class Ship extends Sprite {
 
     protected Rect worldBounds;
 
-    protected Vector2 bulletV = new Vector2();
+    protected Vector2 bulletV = new Vector2(0, 0.5f);
     protected BulletPool bulletPool;
     protected TextureRegion bulletRegion;
     protected float bulletHeight;
     protected int bulletDamage;
 
-    protected Sound shootSound;
+    private Sound shootSound;
+
+    protected float reloadInterval;
+    protected float reloadTimer;
+
+    protected int hp;
 
     public Ship(TextureRegion region, int rows, int cols, int frames, BulletPool bulletPool, Sound shootSound) {
         super(region, rows, cols, frames);

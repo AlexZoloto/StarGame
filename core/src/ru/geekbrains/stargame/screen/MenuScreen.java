@@ -124,4 +124,14 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
             game.setScreen(new GameScreen(game));
         }
     }
+
+    @Override
+    public void pause() {
+        music.pause();
+    }
+
+    @Override
+    public void resume() {
+        music.play();
+    }
 }
