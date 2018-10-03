@@ -39,6 +39,7 @@ public class GameScreen extends Base2DScreen {
     Music music;
     Sound shootBullet;
     Sound bulletSound;
+    Sound explosionSound;
 
     EnemyPool enemyPool;
     EnemiesEmiter enemiesEmiter;
@@ -53,6 +54,7 @@ public class GameScreen extends Base2DScreen {
     public void show() {
         super.show();
         shootBullet = Gdx.audio.newSound(Gdx.files.internal("sounds/shootBlaster.ogg"));
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Sound_19548.wav"));
         bulletSound = Gdx.audio.newSound(Gdx.files.internal("sounds/bullet.wav"));
         music = Gdx.audio.newMusic(Gdx.files.internal("sounds/Jon_Bjork_-_The_Darkest_Hour.mp3"));
         music.setLooping(true);
@@ -67,10 +69,10 @@ public class GameScreen extends Base2DScreen {
             star[i] = new Star(atlasGame);
         }
         bulletPool = new BulletPool();
-        mainShip = new MainShip(atlas, bulletPool, shootBullet);
-        enemyPool = new EnemyPool(bulletPool, bulletSound, mainShip);
-        enemiesEmiter = new EnemiesEmiter(enemyPool, atlas, worldBounds);
         explosionPool = new ExplosionPool(atlas);
+        mainShip = new MainShip(atlas, bulletPool, shootBullet);
+        enemyPool = new EnemyPool(bulletPool, explosionPool, bulletSound, mainShip, worldBounds);
+        enemiesEmiter = new EnemiesEmiter(enemyPool, atlas, worldBounds);
     }
 
     @Override
@@ -146,8 +148,10 @@ public class GameScreen extends Base2DScreen {
             case Input.Keys.UP:
                 Explosion explosion = explosionPool.obtain();
                 explosion.set(0.15f, worldBounds.pos);
+                explosionSound.play();
                 break;
         }
+        mainShip.keyDown(keycode);
         return super.keyDown(keycode);
     }
 

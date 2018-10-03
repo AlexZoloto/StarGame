@@ -1,6 +1,5 @@
 package ru.geekbrains.stargame.utils;
 
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -16,7 +15,7 @@ public class EnemiesEmiter {
     private static float ENEMY_SMALL_BULLET_HEIGHT = 0.01f;
     private static float ENEMY_SMALL_BULLET_VY = -0.3f;
     private static int ENEMY_SMALL_BULLET_DAMAGE = 1;
-    private static float ENEMY_SMALL_RELOAD_INTERVAL = 3f;
+    private static float ENEMY_SMALL_RELOAD_INTERVAL = 2f;
     private static int ENEMY_SMALL_HP = 1;
 
     private static float ENEMY_MEDIUM_HEIGHT = 0.1f;
@@ -37,9 +36,9 @@ public class EnemiesEmiter {
     private final TextureRegion[] enemyMediumRegion;
     private final TextureRegion[] enemyBigRegion;
 
-    private final Vector2 enemySmallV = new Vector2(0f, -0.2f);
-    private final Vector2 enemyMediumlV = new Vector2(0f, -0.03f);
-    private final Vector2 enemyBiglV = new Vector2(0f, -0.05f);
+    private Vector2 enemySmallV = new Vector2(0f, -0.2f);;
+    private Vector2 enemyMediumlV = new Vector2(0f, -0.03f);;
+    private Vector2 enemyBiglV = new Vector2(0f, -0.05f);;
 
     private final EnemyPool enemyPool;
 

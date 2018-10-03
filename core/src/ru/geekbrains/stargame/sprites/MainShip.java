@@ -12,6 +12,7 @@ import ru.geekbrains.stargame.base.Ship;
 import ru.geekbrains.stargame.base.Sprite;
 import ru.geekbrains.stargame.math.Rect;
 import ru.geekbrains.stargame.pool.BulletPool;
+import ru.geekbrains.stargame.pool.ExplosionPool;
 
 
 public class MainShip extends Ship {

@@ -1,14 +1,14 @@
 package ru.geekbrains.stargame.base;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.stargame.math.Rect;
 import ru.geekbrains.stargame.pool.BulletPool;
+import ru.geekbrains.stargame.pool.ExplosionPool;
 import ru.geekbrains.stargame.sprites.Bullet;
+import ru.geekbrains.stargame.sprites.Explosion;
 
 public class Ship extends Sprite {
     protected Vector2 v = new Vector2();
@@ -36,7 +36,7 @@ public class Ship extends Sprite {
         this.bulletDamage = 1;
     }
 
-    public Ship(BulletPool bulletPool, Sound shootSound) {
+    public Ship(BulletPool bulletPool,Sound shootSound) {
         this.bulletPool = bulletPool;
         this.shootSound = shootSound;
     }
@@ -51,5 +51,4 @@ public class Ship extends Sprite {
         bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, bulletDamage);
         shootSound.play();
     }
-
 }
