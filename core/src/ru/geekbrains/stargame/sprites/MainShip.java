@@ -1,15 +1,11 @@
 package ru.geekbrains.stargame.sprites;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-
 import ru.geekbrains.stargame.base.Ship;
-import ru.geekbrains.stargame.base.Sprite;
 import ru.geekbrains.stargame.math.Rect;
 import ru.geekbrains.stargame.pool.BulletPool;
 import ru.geekbrains.stargame.pool.ExplosionPool;
@@ -28,21 +24,29 @@ public class MainShip extends Ship {
     private int rightPointer = INVALID_POINTER;
 
 
-    public MainShip(TextureAtlas atlas, BulletPool bulletPool, Sound shootSound) {
-        super(atlas.findRegion("main_ship"), 1, 2, 2, bulletPool, shootSound);
+    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool, Sound shootSound) {
+        super(atlas.findRegion("main_ship"), 1, 2, 2, bulletPool, explosionPool, shootSound);
         this.bulletRegion = atlas.findRegion("bulletMainShip");
+        startNewGame();
+    }
+
+    public void startNewGame() {
         this.bulletDamage = 1;
         this.bulletHeight = 0.01f;
         this.bulletV.set(0, 0.4f);
         this.reloadInterval = 0.2f;
+        this.hp = 100;
         setHeightProportion(0.15f);
+        stop();
+        flushDestroy();
     }
 
     @Override
     public void update(float delta) {
+        super.update(delta);
         pos.mulAdd(v, delta);
         reloadTimer += delta;
-        if (reloadTimer >= reloadInterval){
+        if (reloadTimer >= reloadInterval) {
             reloadTimer = 0f;
             shoot();
         }
@@ -146,4 +150,12 @@ public class MainShip extends Ship {
         v.setZero();
     }
 
+    public boolean isBulletCollision(Rect bullet) {
+        return !(
+                bullet.getRight() < getLeft()
+                        || bullet.getRight() > getRight()
+                        || bullet.getBottom() > pos.y
+                        || bullet.getTop() < getBottom()
+        );
+    }
 }

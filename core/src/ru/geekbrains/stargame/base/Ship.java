@@ -17,6 +17,7 @@ public class Ship extends Sprite {
 
     protected Vector2 bulletV = new Vector2(0, 0.5f);
     protected BulletPool bulletPool;
+    protected ExplosionPool explosionPool;
     protected TextureRegion bulletRegion;
     protected float bulletHeight;
     protected int bulletDamage;
@@ -26,19 +27,34 @@ public class Ship extends Sprite {
     protected float reloadInterval;
     protected float reloadTimer;
 
+    protected float damageAnimateInterval = 0.1f;
+    protected float damageAnimateTimer;
+
     protected int hp;
 
-    public Ship(TextureRegion region, int rows, int cols, int frames, BulletPool bulletPool, Sound shootSound) {
+    public Ship(TextureRegion region, int rows, int cols, int frames, BulletPool bulletPool,ExplosionPool explosionPool, Sound shootSound) {
         super(region, rows, cols, frames);
         this.bulletPool = bulletPool;
+        this.explosionPool = explosionPool;
         this.shootSound = shootSound;
         this.bulletHeight = 0.01f;
         this.bulletDamage = 1;
     }
 
-    public Ship(BulletPool bulletPool,Sound shootSound) {
+    public Ship(BulletPool bulletPool,ExplosionPool explosionPool, Sound shootSound) {
         this.bulletPool = bulletPool;
+        this.explosionPool = explosionPool;
         this.shootSound = shootSound;
+        this.explosionPool = explosionPool;
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        damageAnimateTimer += delta;
+        if (damageAnimateTimer >= damageAnimateInterval){
+            frame = 0;
+        }
     }
 
     @Override
@@ -50,5 +66,29 @@ public class Ship extends Sprite {
         Bullet bullet = bulletPool.obtain();
         bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, bulletDamage);
         shootSound.play();
+    }
+
+    public void explosionShip(){
+        Explosion explosion = explosionPool.obtain();
+        explosion.set(getHeight(), pos);
+        hp = 0;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public int getBulletDamage() {
+        return bulletDamage;
+    }
+
+    public void damage(int damage){
+        frame = 1;
+        damageAnimateInterval = 0f;
+        hp -= damage;
+        if (hp <= 0){
+            explosionShip();
+            destroy();
+        }
     }
 }
