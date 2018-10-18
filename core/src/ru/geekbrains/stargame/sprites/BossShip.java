@@ -1,6 +1,7 @@
 package ru.geekbrains.stargame.sprites;
 
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
@@ -8,23 +9,30 @@ import ru.geekbrains.stargame.base.Ship;
 import ru.geekbrains.stargame.math.Rect;
 import ru.geekbrains.stargame.pool.BulletPool;
 import ru.geekbrains.stargame.pool.ExplosionPool;
-public class EnemyShip extends Ship {
 
+public class BossShip extends Ship {
     private enum State {DESCENT, FIGHT}
 
     private MainShip mainShip;
-    private Vector2 v0 = new Vector2();
-    private Vector2 descentV = new Vector2(0, -0.15f);
+    private Vector2 v0 = new Vector2(0.3f, 0);
+    private TextureRegion[] bossRegion;
+
     private ExplosionPool explosionPool;
+    private  BulletPool bulletPool;
+
+    private Sound shootSound;
 
     private State state;
 
-    public EnemyShip(BulletPool bulletPool, Sound shootSound, MainShip mainShip, Rect worldBounds, ExplosionPool explosionPool) {
-        super(bulletPool, explosionPool, shootSound);
-        this.mainShip = mainShip;
-        this.v.set(v0);
-        this.worldBounds = worldBounds;
-        this.explosionPool = explosionPool;
+
+    public BossShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool, Sound shootSound) {
+        super(atlas.findRegion("boss_ship"),1,2,2, bulletPool, explosionPool, shootSound);
+        this.bulletRegion = atlas.findRegion("schuss_yellow");
+        this.bulletDamage = 15;
+        this.bulletHeight = 0.03f;
+        this.bulletV.set(0, -0.3f);
+        this.reloadInterval = 0.4f;
+        this.hp = 200;
     }
 
     @Override
@@ -52,37 +60,18 @@ public class EnemyShip extends Ship {
         }
     }
 
-    public void set(
-            TextureRegion[] regions,
-            Vector2 v0,
-            TextureRegion bulletRegion,
-            float bulletHeight,
-            float bulletVY,
-            int bulletDamage,
-            float reloadInterval,
-            float height,
-            int hp
-    ) {
-        this.regions = regions;
-        this.v0 = v0;
-        this.bulletRegion = bulletRegion;
-        this.bulletHeight = bulletHeight;
-        this.bulletV.set(0, bulletVY);
-        this.bulletDamage = bulletDamage;
-        this.reloadInterval = reloadInterval;
-        this.hp = hp;
-        setHeightProportion(height);
-        reloadTimer = reloadInterval;
-        v.set(descentV);
-        state = State.DESCENT;
+    @Override
+    public void resize(Rect worldBounds) {
+        super.worldBounds = worldBounds;
+        setBottom(worldBounds.getTop() + 0.05f);
     }
 
     public boolean isBulletCollision(Rect bullet){
         return !(
                 bullet.getRight()< getLeft()
-                || bullet.getRight() > getRight()
-                || bullet.getBottom() > getTop()
-                || bullet.getTop()< pos.y
+                        || bullet.getRight() > getRight()
+                        || bullet.getBottom() > getTop()
+                        || bullet.getTop()< pos.y
         );
     }
 }

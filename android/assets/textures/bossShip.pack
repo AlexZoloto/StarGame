@@ -1,0 +1,19 @@
+
+bossShip.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+boss_ship
+  rotate: false
+  xy: 1, 99
+  size: 256, 512
+  orig: 256, 512
+  offset: 0, 0
+  index: -1
+schuss_yellow
+  rotate: false
+  xy: 1, 1
+  size: 43, 96
+  orig: 43, 96
+  offset: 0, 0
+  index: -1

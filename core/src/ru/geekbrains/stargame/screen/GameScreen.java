@@ -55,6 +55,8 @@ public class GameScreen extends Base2DScreen implements ActionListener{
 
     EnemiesEmiter enemiesEmiter;
 
+    int destroyedEnemyShips;
+
     State state;
 
     MessageGameOver messageGameOver;
@@ -78,6 +80,7 @@ public class GameScreen extends Base2DScreen implements ActionListener{
         background = new Background(new TextureRegion(bg));
         atlasGame = new TextureAtlas("textures/StarGame.tpack");
         atlas = new TextureAtlas("textures/mainAtlas.tpack");
+        destroyedEnemyShips = 0;
         star = new Star[STAR_COUNT];
         for (int i = 0; i < star.length; i++) {
             star[i] = new Star(atlasGame);
@@ -186,8 +189,10 @@ public class GameScreen extends Base2DScreen implements ActionListener{
         enemyPool.drawActiveObjects(batch);
         explosionPool.drawActiveObjects(batch);
         if (state == State.GAME_OVER){
+            batch.setColor(1,1,1,1);
             messageGameOver.draw(batch);
             buttonNewGame.draw(batch);
+            batch.setColor(0.4f,0.4f,0.4f,1);
         }
         batch.end();
     }
