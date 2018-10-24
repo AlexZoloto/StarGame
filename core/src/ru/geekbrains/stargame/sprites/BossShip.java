@@ -2,37 +2,35 @@ package ru.geekbrains.stargame.sprites;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.stargame.base.Ship;
 import ru.geekbrains.stargame.math.Rect;
+import ru.geekbrains.stargame.math.Rnd;
 import ru.geekbrains.stargame.pool.BulletPool;
 import ru.geekbrains.stargame.pool.ExplosionPool;
 
 public class BossShip extends Ship {
     private enum State {DESCENT, FIGHT}
 
-    private MainShip mainShip;
-    private Vector2 v0 = new Vector2(0.3f, 0);
-    private TextureRegion[] bossRegion;
-
-    private ExplosionPool explosionPool;
-    private  BulletPool bulletPool;
-
-    private Sound shootSound;
+    private Vector2 v0 = new Vector2(Rnd.nextFloat(-0.3f, 0.3f), 0);
+    private Vector2 descentV = new Vector2(0, -0.15f);
 
     private State state;
 
-
-    public BossShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool, Sound shootSound) {
-        super(atlas.findRegion("boss_ship"),1,2,2, bulletPool, explosionPool, shootSound);
+    public BossShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool, Sound shootSound, Rect worldBounds) {
+        super(atlas.findRegion("boss_ship"), 1, 2, 2, bulletPool, explosionPool, shootSound);
+        this.worldBounds = worldBounds;
         this.bulletRegion = atlas.findRegion("schuss_yellow");
-        this.bulletDamage = 15;
-        this.bulletHeight = 0.03f;
-        this.bulletV.set(0, -0.3f);
-        this.reloadInterval = 0.4f;
-        this.hp = 200;
+        this.bulletDamage = 20;
+        this.bulletHeight = 0.05f;
+        this.bulletV.set(0, -0.025f);
+        this.reloadInterval = 1f;
+        this.hp = 50;
+        setHeightProportion(getHeight());
+        reloadTimer = reloadInterval;
+        v.set(descentV);
+        state = State.DESCENT;
     }
 
     @Override
@@ -52,26 +50,13 @@ public class BossShip extends Ship {
                     reloadTimer = 0f;
                     shoot();
                 }
-                if (worldBounds.getBottom() > getBottom()) {
-                    explosionShip();
-                    destroy();
+                if (getRight() > worldBounds.getRight()) {
+                    v0 = new Vector2(Rnd.nextFloat(-0.3f, 0f), 0);
+                }
+                if (getLeft() < worldBounds.getLeft()) {
+                    v0 = new Vector2(Rnd.nextFloat(0, 0.3f), 0);
                 }
                 break;
         }
-    }
-
-    @Override
-    public void resize(Rect worldBounds) {
-        super.worldBounds = worldBounds;
-        setBottom(worldBounds.getTop() + 0.05f);
-    }
-
-    public boolean isBulletCollision(Rect bullet){
-        return !(
-                bullet.getRight()< getLeft()
-                        || bullet.getRight() > getRight()
-                        || bullet.getBottom() > getTop()
-                        || bullet.getTop()< pos.y
-        );
     }
 }
