@@ -20,6 +20,7 @@ import ru.geekbrains.stargame.pool.BulletPool;
 import ru.geekbrains.stargame.pool.EnemyPool;
 import ru.geekbrains.stargame.pool.ExplosionPool;
 import ru.geekbrains.stargame.sprites.Background;
+import ru.geekbrains.stargame.sprites.BossShip;
 import ru.geekbrains.stargame.sprites.Bullet;
 import ru.geekbrains.stargame.sprites.ButtonNewGame;
 import ru.geekbrains.stargame.sprites.EnemyShip;
@@ -30,20 +31,22 @@ import ru.geekbrains.stargame.sprites.Star;
 import ru.geekbrains.stargame.utils.EnemiesEmiter;
 
 
-public class GameScreen extends Base2DScreen implements ActionListener{
+public class GameScreen extends Base2DScreen implements ActionListener {
 
     private static final int STAR_COUNT = 64;
 
-    private enum State{PLAYING, GAME_OVER}
+    private enum State {PLAYING, GAME_OVER}
 
     Background background;
     Texture bg;
     TextureAtlas atlas;
     TextureAtlas atlasGame;
+    TextureAtlas atlasBoss;
 
     Star[] star;
     MainShip mainShip;
     BulletPool bulletPool;
+    BossShip bossShip;
 
     Music music;
     Sound shootBullet;
@@ -80,6 +83,7 @@ public class GameScreen extends Base2DScreen implements ActionListener{
         background = new Background(new TextureRegion(bg));
         atlasGame = new TextureAtlas("textures/StarGame.tpack");
         atlas = new TextureAtlas("textures/mainAtlas.tpack");
+        atlasBoss = new TextureAtlas("textures/bossShip.pack");
         destroyedEnemyShips = 0;
         star = new Star[STAR_COUNT];
         for (int i = 0; i < star.length; i++) {
@@ -90,6 +94,7 @@ public class GameScreen extends Base2DScreen implements ActionListener{
         mainShip = new MainShip(atlas, bulletPool, explosionPool, shootBullet);
         enemyPool = new EnemyPool(bulletPool, explosionPool, bulletSound, mainShip, worldBounds);
         enemiesEmiter = new EnemiesEmiter(enemyPool, atlas, worldBounds);
+        bossShip = new BossShip(atlasBoss, bulletPool, explosionPool, shootBullet, worldBounds);
         messageGameOver = new MessageGameOver(atlas);
         buttonNewGame = new ButtonNewGame(atlas, this);
         startNewGame();
@@ -111,14 +116,15 @@ public class GameScreen extends Base2DScreen implements ActionListener{
         explosionPool.updateActiveObjects(delta);
         bulletPool.updateActiveObjects(delta);
 
-        if (mainShip.isDestroyed()){
+        if (mainShip.isDestroyed()) {
             state = State.GAME_OVER;
         }
-        switch (state){
+        switch (state) {
             case PLAYING:
                 mainShip.update(delta);
                 enemyPool.updateActiveObjects(delta);
                 enemiesEmiter.generateEnemies(delta);
+//                bossShip.update(delta);
                 break;
             case GAME_OVER:
                 break;
@@ -128,12 +134,12 @@ public class GameScreen extends Base2DScreen implements ActionListener{
     public void checkCollisions() {
         //Столкновение кораблей
         List<EnemyShip> enemyList = enemyPool.getActiveObjects();
-        for (EnemyShip enemyShip : enemyList){
-            if (enemyShip.isDestroyed()){
+        for (EnemyShip enemyShip : enemyList) {
+            if (enemyShip.isDestroyed()) {
                 continue;
             }
             float minDist = enemyShip.getHalfWidth() + mainShip.getHalfWidth();
-            if (enemyShip.pos.dst2(mainShip.pos) < minDist * minDist){
+            if (enemyShip.pos.dst2(mainShip.pos) < minDist * minDist) {
                 enemyShip.destroy();
                 enemyShip.explosionShip();
                 mainShip.damage(10 * enemyShip.getBulletDamage());
@@ -142,15 +148,15 @@ public class GameScreen extends Base2DScreen implements ActionListener{
         }
         //Столкновение вражеских кораблей с нашей пулей
         List<Bullet> bulletList = bulletPool.getActiveObjects();
-        for(EnemyShip enemyShip : enemyList){
-            if (enemyShip.isDestroyed()){
+        for (EnemyShip enemyShip : enemyList) {
+            if (enemyShip.isDestroyed()) {
                 continue;
             }
-            for (Bullet bullet : bulletList){
-                if (bullet.getOwner() != mainShip || bullet.isDestroyed()){
+            for (Bullet bullet : bulletList) {
+                if (bullet.getOwner() != mainShip || bullet.isDestroyed()) {
                     continue;
                 }
-                if (enemyShip.isBulletCollision(bullet)){
+                if (enemyShip.isBulletCollision(bullet)) {
                     bullet.destroy();
                     enemyShip.damage(bullet.getDamage());
                     return;
@@ -158,11 +164,11 @@ public class GameScreen extends Base2DScreen implements ActionListener{
             }
         }
         //Столкновение игрового корабля с пулей
-        for (Bullet bullet: bulletList){
-            if (bullet.getOwner() == mainShip || bullet.isDestroyed()){
+        for (Bullet bullet : bulletList) {
+            if (bullet.getOwner() == mainShip || bullet.isDestroyed()) {
                 continue;
             }
-            if (mainShip.isBulletCollision(bullet)){
+            if (mainShip.isBulletCollision(bullet)) {
                 mainShip.damage(bullet.getDamage());
                 bullet.destroy();
             }
@@ -188,11 +194,12 @@ public class GameScreen extends Base2DScreen implements ActionListener{
         bulletPool.drawActiveObjects(batch);
         enemyPool.drawActiveObjects(batch);
         explosionPool.drawActiveObjects(batch);
-        if (state == State.GAME_OVER){
-            batch.setColor(1,1,1,1);
+//        bossShip.draw(batch);
+        if (state == State.GAME_OVER) {
+            batch.setColor(1, 1, 1, 1);
             messageGameOver.draw(batch);
             buttonNewGame.draw(batch);
-            batch.setColor(0.4f,0.4f,0.4f,1);
+            batch.setColor(0.4f, 0.4f, 0.4f, 1);
         }
         batch.end();
     }
@@ -221,7 +228,7 @@ public class GameScreen extends Base2DScreen implements ActionListener{
 
     @Override
     public boolean keyDown(int keycode) {
-        if (state == State.PLAYING){
+        if (state == State.PLAYING) {
             mainShip.keyDown(keycode);
         }
         return super.keyDown(keycode);
@@ -229,7 +236,7 @@ public class GameScreen extends Base2DScreen implements ActionListener{
 
     @Override
     public boolean keyUp(int keycode) {
-        if (state == State.PLAYING){
+        if (state == State.PLAYING) {
             mainShip.keyUp(keycode);
         }
         return super.keyUp(keycode);
@@ -238,10 +245,10 @@ public class GameScreen extends Base2DScreen implements ActionListener{
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer) {
-        if (state == State.PLAYING){
+        if (state == State.PLAYING) {
             mainShip.touchDown(touch, pointer);
         }
-        if (state == State.GAME_OVER){
+        if (state == State.GAME_OVER) {
             buttonNewGame.touchDown(touch, pointer);
         }
         return super.touchDown(touch, pointer);
@@ -249,10 +256,10 @@ public class GameScreen extends Base2DScreen implements ActionListener{
 
     @Override
     public boolean touchUp(Vector2 touch, int pointer) {
-        if (state == State.PLAYING){
+        if (state == State.PLAYING) {
             mainShip.touchUp(touch, pointer);
         }
-        if (state == State.GAME_OVER){
+        if (state == State.GAME_OVER) {
             buttonNewGame.touchUp(touch, pointer);
         }
         return super.touchUp(touch, pointer);
@@ -268,7 +275,7 @@ public class GameScreen extends Base2DScreen implements ActionListener{
         music.play();
     }
 
-    private  void startNewGame(){
+    private void startNewGame() {
         state = State.PLAYING;
 
         mainShip.startNewGame();
@@ -280,7 +287,7 @@ public class GameScreen extends Base2DScreen implements ActionListener{
 
     @Override
     public void actionPerformed(Object src) {
-        if (src == buttonNewGame){
+        if (src == buttonNewGame) {
             startNewGame();
         }
     }
